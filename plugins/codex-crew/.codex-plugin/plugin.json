@@ -20,7 +20,6 @@
     "gradle"
   ],
   "skills": "./skills/",
-  "hooks": "./hooks/hooks.json",
   "interface": {
     "displayName": "Codex Crew",
     "shortDescription": "Persistent workflows and stack skills for Codex.",
