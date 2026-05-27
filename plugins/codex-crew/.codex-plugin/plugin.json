@@ -1,0 +1,41 @@
+{
+  "name": "codex-crew",
+  "version": "0.1.0",
+  "description": "Codex workflows, persistence hooks, custom agent templates, and tech-stack skills",
+  "author": {
+    "name": "Jeremy Luinstra",
+    "email": "luinstra@gmail.com",
+    "url": "https://github.com/luinstra"
+  },
+  "homepage": "https://github.com/luinstra/codex_crew",
+  "repository": "https://github.com/luinstra/codex_crew",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "skills",
+    "hooks",
+    "persistence",
+    "planning",
+    "kotlin",
+    "gradle"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json",
+  "interface": {
+    "displayName": "Codex Crew",
+    "shortDescription": "Persistent workflows and stack skills for Codex.",
+    "longDescription": "Codex Crew ports the Claude Crew workflow model to Codex with a workflow skill, SessionStart and Stop hooks, custom agent templates, and technology skills for Kotlin, Kotlin testing, Exposed, Gradle, Trino, Python, and Git.",
+    "developerName": "Jeremy Luinstra",
+    "category": "Productivity",
+    "capabilities": [
+      "Skills",
+      "Hooks",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Codex Crew to plan this change.",
+      "Use Codex Crew build loop for this task.",
+      "Use the Kotlin and Gradle skills for this repo."
+    ]
+  }
+}

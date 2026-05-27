@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/scripts/session-start.py\"",
+            "timeout": 10,
+            "statusMessage": "Loading Codex Crew context"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/scripts/persistent-mode.py\"",
+            "timeout": 5,
+            "statusMessage": "Checking Codex Crew loops"
+          }
+        ]
+      }
+    ]
+  }
+}
