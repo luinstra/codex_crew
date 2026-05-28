@@ -1,9 +1,9 @@
 ---
-name: codex-crew
-description: Use this skill for Codex Crew workflows: planning a non-trivial task, executing an existing plan, running a verified build loop, running a measure-twice plan-review loop, saving or restoring working context, checking crew status, or creating AGENTS.md project guidance. Trigger when the user says "crew", "plan this", "execute the plan", "build loop", "measure twice", "save context", "restore context", "deepinit", or asks for persistent verified work.
+name: crew
+description: Use this skill for Crew workflows: planning a non-trivial task, executing an existing plan, running a verified build loop, running a measure-twice plan-review loop, saving or restoring working context, checking crew status, or creating AGENTS.md project guidance. Trigger when the user says "crew", "plan this", "execute the plan", "build loop", "measure twice", "save context", "restore context", "deepinit", or asks for persistent verified work.
 ---
 
-# Codex Crew Workflows
+# Crew Workflows
 
 This skill ports the Claude Crew workflow model to Codex. It provides promptable workflows rather than slash commands.
 
@@ -23,15 +23,15 @@ Use these prompt forms:
 
 | Old Claude command | Codex prompt |
 | --- | --- |
-| `/crew:plan "task"` | "Use Codex Crew to plan: task" |
-| `/crew:execute plan` | "Use Codex Crew to execute: plan" |
-| `/crew:review plan` | "Use Codex Crew to review this plan" |
-| `/crew:build "task"` | "Use Codex Crew build loop for: task" |
-| `/crew:measure-twice "task"` | "Use Codex Crew measure twice for: task" |
-| `/crew:status` | "Use Codex Crew status" |
-| `/crew:save-context` | "Use Codex Crew save context" |
-| `/crew:restore-context` | "Use Codex Crew restore context" |
-| `/crew:deepinit` | "Use Codex Crew deepinit" |
+| `/crew:plan "task"` | "crew plan: task" |
+| `/crew:execute plan` | "crew execute: plan" |
+| `/crew:review plan` | "crew review this plan" |
+| `/crew:build "task"` | "crew build: task" |
+| `/crew:measure-twice "task"` | "crew measure twice: task" |
+| `/crew:status` | "crew status" |
+| `/crew:save-context` | "crew save context" |
+| `/crew:restore-context` | "crew restore context" |
+| `/crew:deepinit` | "crew deepinit" |
 
 ## Status
 

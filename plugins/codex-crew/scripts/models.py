@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Data models for Codex Crew hooks.
+Data models for Crew hooks.
 
 All JSON structures used by hooks are defined here as dataclasses
 for type safety, validation, and self-documentation.

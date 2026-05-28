@@ -1,4 +1,4 @@
-# Codex Crew
+# Crew
 
 ## Repository Expectations
 

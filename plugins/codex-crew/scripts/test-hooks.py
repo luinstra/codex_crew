@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests for Codex Crew scripts."""
+"""Tests for Crew scripts."""
 
 import json
 import os
@@ -81,7 +81,7 @@ class CrewStateTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             payload = json.loads(result.stdout)
             self.assertEqual(payload["decision"], "block")
-            self.assertIn("Codex Crew Build Loop", payload["reason"])
+            self.assertIn("Crew Build Loop", payload["reason"])
 
     def test_stop_hook_allows_when_no_loop_is_active(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -109,7 +109,7 @@ class CrewStateTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             payload = json.loads(result.stdout)
             context = payload["hookSpecificOutput"]["additionalContext"]
-            self.assertIn("Codex Crew is available", context)
+            self.assertIn("Crew is available", context)
 
 
 if __name__ == "__main__":

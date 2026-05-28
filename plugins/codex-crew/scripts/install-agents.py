@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install Codex Crew custom agent templates."""
+"""Install Crew custom agent templates."""
 
 import argparse
 import shutil
@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Install Codex Crew custom agents.")
+    parser = argparse.ArgumentParser(description="Install Crew custom agents.")
     parser.add_argument(
         "--target",
         default=str(Path.home() / ".codex" / "agents"),

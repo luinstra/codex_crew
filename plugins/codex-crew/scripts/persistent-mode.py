@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Codex Crew Stop hook.
+"""Crew Stop hook.
 
 Blocks Stop while a build or measure-twice loop is active.
 """
@@ -46,7 +46,7 @@ def main() -> None:
             if build_state.iteration < build_state.max_iterations:
                 build_state.iteration += 1
                 build_state.save(build_file)
-                block(f"""[Codex Crew Build Loop - Iteration {build_state.iteration}/{build_state.max_iterations}]
+                block(f"""[Crew Build Loop - Iteration {build_state.iteration}/{build_state.max_iterations}]
 
 Task: {build_state.prompt}
 
@@ -60,7 +60,7 @@ Continue working. Before completing:
 
             build_state.active = False
             build_state.save(build_file)
-            block(f"""[Codex Crew Build Loop - Safety Limit Reached]
+            block(f"""[Crew Build Loop - Safety Limit Reached]
 
 Maximum iterations ({build_state.max_iterations}) reached. The loop has been deactivated.
 
@@ -75,7 +75,7 @@ Summarize what was accomplished and call out any remaining risk.
             if measure_state.iteration < measure_state.max_iterations:
                 measure_state.iteration += 1
                 measure_state.save(measure_file)
-                block(f"""[Codex Crew Measure-Twice Loop - Iteration {measure_state.iteration}/{measure_state.max_iterations}]
+                block(f"""[Crew Measure-Twice Loop - Iteration {measure_state.iteration}/{measure_state.max_iterations}]
 
 Task: {measure_state.task_description}
 Plan: {measure_state.plan_file}
@@ -90,7 +90,7 @@ Continue refining the plan:
 
             measure_state.active = False
             measure_state.save(measure_file)
-            block(f"""[Codex Crew Measure-Twice Loop - Safety Limit Reached]
+            block(f"""[Crew Measure-Twice Loop - Safety Limit Reached]
 
 Maximum iterations ({measure_state.max_iterations}) reached. The loop has been deactivated.
 

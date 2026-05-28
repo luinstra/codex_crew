@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Codex Crew state management CLI for build and measure-twice persistence."""
+"""Crew state management CLI for build and measure-twice persistence."""
 
 import argparse
 import json
@@ -153,12 +153,12 @@ def check_for_conflicts(session_id: str = ""):
     bl_path = crew_dir / get_loop_filename("bl", session_id)
     bl_state = BuildState.load(bl_path)
     if bl_state.active:
-        return "ERROR: build loop is already active. Ask Codex Crew to cancel the build loop first or let it complete."
+        return "ERROR: build loop is already active. Ask crew to cancel the build loop first or let it complete."
 
     mt_path = crew_dir / get_loop_filename("mt", session_id)
     mt_state = MeasureTwiceState.load(mt_path)
     if mt_state.active:
-        return "ERROR: measure-twice loop is already active. Ask Codex Crew to cancel the measure-twice loop first or let it complete."
+        return "ERROR: measure-twice loop is already active. Ask crew to cancel the measure-twice loop first or let it complete."
 
     return None
 

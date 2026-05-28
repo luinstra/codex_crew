@@ -21,9 +21,9 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "Codex Crew",
+    "displayName": "Crew",
     "shortDescription": "Persistent workflows and stack skills for Codex.",
-    "longDescription": "Codex Crew ports the Claude Crew workflow model to Codex with a workflow skill, SessionStart and Stop hooks, custom agent templates, and technology skills for Kotlin, Kotlin testing, Exposed, Gradle, Trino, Python, and Git.",
+    "longDescription": "Crew ports the Claude Crew workflow model to Codex with a workflow skill, SessionStart and Stop hooks, custom agent templates, and technology skills for Kotlin, Kotlin testing, Exposed, Gradle, Trino, Python, and Git.",
     "developerName": "Jeremy Luinstra",
     "category": "Productivity",
     "capabilities": [
@@ -32,8 +32,8 @@
       "Write"
     ],
     "defaultPrompt": [
-      "Use Codex Crew to plan this change.",
-      "Use Codex Crew build loop for this task.",
+      "crew plan: this change.",
+      "crew build: this task.",
       "Use the Kotlin and Gradle skills for this repo."
     ]
   }

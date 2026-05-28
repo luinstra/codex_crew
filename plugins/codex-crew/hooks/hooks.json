@@ -8,7 +8,7 @@
             "type": "command",
             "command": "python3 \"${PLUGIN_ROOT}/scripts/session-start.py\"",
             "timeout": 10,
-            "statusMessage": "Loading Codex Crew context"
+            "statusMessage": "Loading Crew context"
           }
         ]
       }
@@ -20,7 +20,7 @@
             "type": "command",
             "command": "python3 \"${PLUGIN_ROOT}/scripts/persistent-mode.py\"",
             "timeout": 5,
-            "statusMessage": "Checking Codex Crew loops"
+            "statusMessage": "Checking Crew loops"
           }
         ]
       }
