@@ -13,10 +13,12 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PLUGIN_ROOT = SCRIPT_DIR.parent
+REPO_ROOT = PLUGIN_ROOT.parent.parent
 CREW_STATE = SCRIPT_DIR / "crew-state.py"
 PERSISTENT_MODE = SCRIPT_DIR / "persistent-mode.py"
 SESSION_START = SCRIPT_DIR / "session-start.py"
 INSTALL_AGENTS = SCRIPT_DIR / "install-agents.py"
+VERSION_BUMP = REPO_ROOT / "scripts" / "post-commit-version-bump.sh"
 PLUGIN_MANIFEST = PLUGIN_ROOT / ".codex-plugin" / "plugin.json"
 CREW_SKILL = PLUGIN_ROOT / "skills" / "codex-crew" / "SKILL.md"
 KOTLIN_SKILL = PLUGIN_ROOT / "skills" / "kotlin" / "SKILL.md"
@@ -67,6 +69,46 @@ def skill_description(skill_path: Path) -> str:
             else:
                 break
     return " ".join(parts)
+
+
+def run_git(project_dir: Path, args: list[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *args],
+        text=True,
+        capture_output=True,
+        check=False,
+        cwd=project_dir,
+    )
+
+
+def write_minimal_manifest(project_dir: Path, version: str = "0.1.0") -> Path:
+    manifest = project_dir / "plugins" / "codex-crew" / ".codex-plugin" / "plugin.json"
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(json.dumps({
+        "name": "codex-crew",
+        "version": version,
+        "interface": {"displayName": "Crew"},
+    }, indent=2))
+    return manifest
+
+
+def init_version_bump_repo(project_dir: Path) -> Path:
+    manifest = write_minimal_manifest(project_dir)
+    plugin_readme = project_dir / "plugins" / "codex-crew" / "README.md"
+    plugin_readme.write_text("# Crew\n")
+
+    for args in [
+        ["init"],
+        ["config", "user.email", "test@example.com"],
+        ["config", "user.name", "Test User"],
+        ["add", "."],
+        ["commit", "-m", "chore: initial [skip version]"],
+    ]:
+        result = run_git(project_dir, args)
+        if result.returncode != 0:
+            raise AssertionError(result.stderr)
+
+    return manifest
 
 
 class CrewStateTests(unittest.TestCase):
@@ -376,6 +418,65 @@ class CrewStateTests(unittest.TestCase):
                     "crew_reader.toml",
                 ],
             )
+
+    def test_version_bump_script_updates_codex_plugin_manifest(self) -> None:
+        self.assertTrue(VERSION_BUMP.is_file())
+
+        with tempfile.TemporaryDirectory() as tmp:
+            project_dir = Path(tmp)
+            manifest = init_version_bump_repo(project_dir)
+            plugin_readme = project_dir / "plugins" / "codex-crew" / "README.md"
+            plugin_readme.write_text("# Crew\n\nUpdated behavior.\n")
+
+            for args in [
+                ["add", "."],
+                ["commit", "-m", "fix: quiet session-start hook"],
+            ]:
+                result = run_git(project_dir, args)
+                self.assertEqual(result.returncode, 0, result.stderr)
+
+            result = subprocess.run(
+                [str(VERSION_BUMP)],
+                text=True,
+                capture_output=True,
+                check=False,
+                cwd=project_dir,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(manifest.read_text())["version"], "0.1.1")
+
+            log = run_git(project_dir, ["log", "-1", "--format=%s"])
+            self.assertEqual(
+                log.stdout.strip(),
+                "chore: bump version (codex-crew 0.1.0 -> 0.1.1)",
+            )
+
+    def test_version_bump_script_skips_non_plugin_changes(self) -> None:
+        self.assertTrue(VERSION_BUMP.is_file())
+
+        with tempfile.TemporaryDirectory() as tmp:
+            project_dir = Path(tmp)
+            manifest = init_version_bump_repo(project_dir)
+            (project_dir / "notes.md").write_text("Internal note.\n")
+
+            for args in [
+                ["add", "."],
+                ["commit", "-m", "docs: add internal note"],
+            ]:
+                result = run_git(project_dir, args)
+                self.assertEqual(result.returncode, 0, result.stderr)
+
+            result = subprocess.run(
+                [str(VERSION_BUMP)],
+                text=True,
+                capture_output=True,
+                check=False,
+                cwd=project_dir,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(manifest.read_text())["version"], "0.1.0")
 
 
 if __name__ == "__main__":

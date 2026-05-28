@@ -104,6 +104,16 @@ To restore generic Crew guidance and stack-skill hints on every session start, l
 CODEX_CREW_SESSION_START=verbose
 ```
 
+## Version Bump Hook
+
+Install the local Git hook if you want plugin changes to bump `plugins/codex-crew/.codex-plugin/plugin.json` automatically after commits:
+
+```bash
+ln -sf ../../scripts/post-commit-version-bump.sh .git/hooks/post-commit
+```
+
+The hook follows conventional commit subjects: `feat:` triggers a minor bump, breaking-change markers trigger a major bump, and other plugin changes trigger a patch bump. Add `[skip version]` or `[no bump]` to a commit message to skip it.
+
 ## Development
 
 Run the script tests:

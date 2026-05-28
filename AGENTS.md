@@ -13,6 +13,7 @@
 | --- | --- |
 | `python3 plugins/codex-crew/scripts/test-hooks.py` | Run script tests |
 | `python3 plugins/codex-crew/scripts/install-agents.py` | Install custom agent templates |
+| `ln -sf ../../scripts/post-commit-version-bump.sh .git/hooks/post-commit` | Install version bump hook |
 | `find plugins/codex-crew -maxdepth 3 -type f \| sort` | Inspect plugin contents |
 
 ## Architecture
