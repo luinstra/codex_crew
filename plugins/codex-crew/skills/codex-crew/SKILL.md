@@ -1,6 +1,7 @@
 ---
 name: crew
-description: Use this skill for Crew workflows: planning a non-trivial task, executing an existing plan, running a verified build loop, running a measure-twice plan-review loop, saving or restoring working context, checking crew status, or creating AGENTS.md project guidance. Trigger when the user says "crew", "plan this", "execute the plan", "build loop", "measure twice", "save context", "restore context", "deepinit", or asks for persistent verified work.
+description: >-
+  Use this skill for Crew workflows: analyzing code, bugs, or architecture; planning a non-trivial task; executing an existing plan; running a verified build loop; running a measure-twice plan-review loop; saving or restoring working context; checking crew status; or creating AGENTS.md project guidance. Trigger when the user says "crew", "analyze this", "plan this", "execute the plan", "build loop", "measure twice", "save context", "restore context", "deepinit", or asks for persistent verified work.
 ---
 
 # Crew Workflows
@@ -23,6 +24,7 @@ Use these prompt forms:
 
 | Old Claude command | Codex prompt |
 | --- | --- |
+| `/crew:analyze "target"` | "crew analyze: target" |
 | `/crew:plan "task"` | "crew plan: task" |
 | `/crew:execute plan` | "crew execute: plan" |
 | `/crew:review plan` | "crew review this plan" |
@@ -49,6 +51,27 @@ Report:
 - Build loop: active or inactive, iteration, task.
 - Measure-twice loop: active or inactive, iteration, task, plan path.
 - Context snapshot: present or absent.
+
+## Analysis Workflow
+
+Use when the user asks to analyze code, bugs, behavior, architecture, trade-offs, or root causes.
+
+This is the Codex replacement for `/crew:analyze`.
+
+1. Gather relevant context before advising.
+2. Inspect concrete files, commands, logs, or docs as needed.
+3. Separate observed symptoms from likely causes.
+4. Cite specific files and line numbers when local code is involved.
+5. If the user explicitly asks for a subagent or names `crew_advisor`, delegate to that custom agent when available. Otherwise perform the analysis directly.
+
+Return:
+
+1. Summary
+2. Diagnosis
+3. Root cause, when identifiable
+4. Recommendations
+5. Trade-offs or risks
+6. References
 
 ## Planning Workflow
 

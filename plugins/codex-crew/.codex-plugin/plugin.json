@@ -32,6 +32,7 @@
       "Write"
     ],
     "defaultPrompt": [
+      "crew analyze: this issue.",
       "crew plan: this change.",
       "crew build: this task.",
       "Use the Kotlin and Gradle skills for this repo."

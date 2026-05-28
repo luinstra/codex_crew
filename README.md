@@ -64,6 +64,7 @@ Crew uses promptable workflows instead of Claude slash commands:
 
 | Intent | Prompt |
 | --- | --- |
+| Analyze | `crew analyze: ...` |
 | Plan | `crew plan: ...` |
 | Execute | `crew execute: ...` |
 | Review | `crew review this plan` |
