@@ -264,7 +264,7 @@ class MeasureTwiceState:
     """State for measure-twice plan-review-revise loop."""
     active: bool = False
     task_description: str = ""
-    plan_file: str = ""  # Path to current plan, e.g., ".codex-crew/plans/auth-system.md"
+    plan_file: str = ""  # Path to current plan, e.g., ".crew/plans/auth-system.md"
     iteration: int = 1
     max_iterations: int = 10
     last_verdict: str = ""  # APPROVED, REVISE, REJECT, or empty

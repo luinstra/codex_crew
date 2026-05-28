@@ -90,7 +90,7 @@ Crew uses promptable workflows instead of Claude slash commands:
 | Configure project | `crew configure` |
 | Deepinit | `crew deepinit` |
 
-State is stored under `.codex-crew/` in the active project.
+State is stored under `.crew/` in the active project so Codex and Claude Crew can share plans, context snapshots, and loop state. Loop state files include `CODEX_SESSION_ID`, `CODEX_THREAD_ID`, `CLAUDE_SESSION_ID`, or an explicit `--session-id` when available; plans and context snapshots are shared intentionally.
 
 `crew configure` is intentionally not a direct copy of Claude Crew's `/crew:crew-config`. In Codex, the project guidance path is `AGENTS.md`; use `crew configure` or `crew deepinit` to create or update project-local guidance instead of copying Claude-specific config.
 
@@ -134,6 +134,6 @@ This repo intentionally does not try to copy Claude Crew one-to-one:
 
 - Claude slash commands become a Codex workflow skill.
 - Claude agent definitions become Codex custom agent templates.
-- Claude `.crew/` state becomes `.codex-crew/` state.
+- Codex Crew shares Claude Crew's `.crew/` workflow directory.
 - `CLAUDE.md` generation becomes `AGENTS.md` generation.
 - Claude Stop hook continuation becomes Codex `decision: "block"` continuation.

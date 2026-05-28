@@ -153,7 +153,7 @@ class CrewStateTests(unittest.TestCase):
             self.assertLessEqual(len(lines), 180, skill_path)
             self.assertTrue(references_dir.is_dir(), skill_path)
 
-    def test_build_loop_state_is_codex_scoped(self) -> None:
+    def test_build_loop_state_uses_shared_crew_directory(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project_dir = Path(tmp)
             result = run_script(
@@ -163,13 +163,15 @@ class CrewStateTests(unittest.TestCase):
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
-            state_file = project_dir / ".codex-crew" / "build-state-session-123.json"
+            state_file = project_dir / ".crew" / "build-state-session-123.json"
             self.assertTrue(state_file.is_file())
+            self.assertFalse((project_dir / ".codex-crew").exists())
             state = json.loads(state_file.read_text())
             self.assertTrue(state["active"])
             self.assertEqual(state["prompt"], "Fix auth")
+            self.assertEqual(state["session_id"], "session-123")
 
-    def test_measure_twice_auto_plan_uses_codex_directory(self) -> None:
+    def test_measure_twice_auto_plan_uses_shared_crew_directory(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project_dir = Path(tmp)
             result = run_script(
@@ -179,8 +181,27 @@ class CrewStateTests(unittest.TestCase):
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn(".codex-crew/plans/add-profiles.md", result.stdout)
-            self.assertTrue((project_dir / ".codex-crew" / "plans").is_dir())
+            self.assertIn(".crew/plans/add-profiles.md", result.stdout)
+            self.assertTrue((project_dir / ".crew" / "plans").is_dir())
+            state_file = project_dir / ".crew" / "measure-twice-state-session-123.json"
+            state = json.loads(state_file.read_text())
+            self.assertEqual(state["plan_file"], ".crew/plans/add-profiles.md")
+
+    def test_state_uses_codex_thread_id_when_session_id_is_absent(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project_dir = Path(tmp)
+            result = run_script(
+                CREW_STATE,
+                ["init", "bl", "--prompt", "Fix auth"],
+                project_dir,
+                env_overrides={"CODEX_SESSION_ID": "", "CODEX_THREAD_ID": "thread-123"},
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            state_file = project_dir / ".crew" / "build-state-thread-123.json"
+            self.assertTrue(state_file.is_file())
+            state = json.loads(state_file.read_text())
+            self.assertEqual(state["session_id"], "thread-123")
 
     def test_deactivate_records_reason_and_completion_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -199,7 +220,7 @@ class CrewStateTests(unittest.TestCase):
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
-            state = json.loads((project_dir / ".codex-crew" / "build-state-session-123.json").read_text())
+            state = json.loads((project_dir / ".crew" / "build-state-session-123.json").read_text())
             self.assertFalse(state["active"])
             self.assertEqual(state["reason"], "Verified complete")
             self.assertIn("completed_at", state)
@@ -243,6 +264,7 @@ class CrewStateTests(unittest.TestCase):
             payload = json.loads(result.stdout)
             self.assertEqual(payload["decision"], "block")
             self.assertIn("Crew Build Loop", payload["reason"])
+            self.assertIn("--session-id session-123", payload["reason"])
 
     def test_stop_hook_blocks_active_measure_twice_loop(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -265,6 +287,7 @@ class CrewStateTests(unittest.TestCase):
             payload = json.loads(result.stdout)
             self.assertEqual(payload["decision"], "block")
             self.assertIn("Crew Measure-Twice Loop", payload["reason"])
+            self.assertIn("--session-id session-123", payload["reason"])
 
     def test_stop_hook_allows_when_no_loop_is_active(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -302,7 +325,7 @@ class CrewStateTests(unittest.TestCase):
                 "// trino\n"
             )
             (project_dir / "tool.py").write_text("print('hello')\n")
-            crew_dir = project_dir / ".codex-crew"
+            crew_dir = project_dir / ".crew"
             crew_dir.mkdir()
             (crew_dir / "context-snapshot.md").write_text("# Snapshot\n")
 
@@ -326,12 +349,13 @@ class CrewStateTests(unittest.TestCase):
                 "Context Snapshot Available",
             ]:
                 self.assertIn(expected, context)
+            self.assertIn(".crew/context-snapshot.md", context)
 
     def test_session_start_reports_context_snapshot_without_stack_hints(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project_dir = Path(tmp)
             (project_dir / "tool.py").write_text("print('hello')\n")
-            crew_dir = project_dir / ".codex-crew"
+            crew_dir = project_dir / ".crew"
             crew_dir.mkdir()
             (crew_dir / "context-snapshot.md").write_text("# Snapshot\n")
 
@@ -345,12 +369,13 @@ class CrewStateTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
             self.assertIn("Context Snapshot Available", context)
+            self.assertIn(".crew/context-snapshot.md", context)
             self.assertNotIn("Relevant skills may include", context)
 
     def test_session_start_reports_other_active_sessions(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project_dir = Path(tmp)
-            crew_dir = project_dir / ".codex-crew"
+            crew_dir = project_dir / ".crew"
             crew_dir.mkdir()
             (crew_dir / "build-state-other.json").write_text(json.dumps({
                 "active": True,
@@ -374,7 +399,7 @@ class CrewStateTests(unittest.TestCase):
     def test_session_start_cleans_stale_loop_files(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project_dir = Path(tmp)
-            crew_dir = project_dir / ".codex-crew"
+            crew_dir = project_dir / ".crew"
             crew_dir.mkdir()
             inactive = crew_dir / "build-state-stale.json"
             active = crew_dir / "measure-twice-state-old.json"

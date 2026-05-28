@@ -15,6 +15,8 @@ from models import (
 )
 from state_discovery import find_session_state_file
 
+CREW_DIR_NAME = ".crew"
+
 
 def allow() -> None:
     print("{}")
@@ -31,13 +33,21 @@ def crew_state_command() -> str:
     return "python3 <codex-crew-plugin-root>/scripts/crew-state.py"
 
 
+def session_flag(session_id: str) -> str:
+    """Return the CLI session argument for scoped state commands."""
+    if not session_id:
+        return ""
+    return f" --session-id {session_id}"
+
+
 def main() -> None:
     data = read_hook_input()
     hook_input = StopInput.from_dict(data)
     directory = hook_input.directory_path
     session_id = hook_input.session_id
-    crew_dir = directory / ".codex-crew"
+    crew_dir = directory / CREW_DIR_NAME
     state_cmd = crew_state_command()
+    scoped = session_flag(session_id)
 
     build_file = find_session_state_file(crew_dir, "build-state", session_id)
     if build_file:
@@ -53,7 +63,7 @@ Task: {build_state.prompt}
 Continue working. Before completing:
 1. Verify the implementation against the original task.
 2. Run the relevant build, test, or lint checks.
-3. If complete, run: {state_cmd} deactivate bl --reason "Verified complete"
+3. If complete, run: {state_cmd} deactivate bl{scoped} --reason "Verified complete"
 4. If blocking issues remain, fix them and verify again.
 """)
                 return
@@ -83,7 +93,7 @@ Plan: {measure_state.plan_file}
 Continue refining the plan:
 1. Address all [BLOCKING] review issues.
 2. Review the plan again for clarity, completeness, and executability.
-3. If approved or only [MINOR] issues remain, run: {state_cmd} deactivate mt --reason "Plan approved"
+3. If approved or only [MINOR] issues remain, run: {state_cmd} deactivate mt{scoped} --reason "Plan approved"
 4. Present the final plan to the user.
 """)
                 return

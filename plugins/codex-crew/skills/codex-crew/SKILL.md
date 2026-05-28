@@ -10,7 +10,8 @@ Read [Workflow Reference](references/workflows.md) before running a Crew workflo
 
 ## Core Rules
 
-- Keep state in `.codex-crew/` and plans in `.codex-crew/plans/`.
+- Keep shared Crew state in `.crew/` and plans in `.crew/plans/`.
+- Loop state files are session-scoped from Codex or Claude session/thread IDs; plans and context snapshots are intentionally shared with Claude Crew.
 - Run verification before declaring implementation work complete.
 - Use Codex subagents only when the user explicitly asks for subagents, delegation, parallel agents, or a named custom agent.
 - For script commands, resolve `../../scripts/crew-state.py` relative to this `SKILL.md` file.

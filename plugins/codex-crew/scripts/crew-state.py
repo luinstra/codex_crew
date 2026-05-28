@@ -23,6 +23,8 @@ LOOP_CLASSES = {
     "mt": MeasureTwiceState,
 }
 
+CREW_DIR_NAME = ".crew"
+
 
 def get_loop_filename(canonical: str, session_id: str = "") -> str:
     """Get the state filename for a loop, optionally scoped to a session."""
@@ -47,13 +49,17 @@ def resolve_session_id(args) -> str:
 
     Resolution order:
     1. --session-id CLI argument (highest priority)
-    2. CODEX_SESSION_ID or CLAUDE_SESSION_ID environment variable
+    2. CODEX_SESSION_ID, CODEX_THREAD_ID, or CLAUDE_SESSION_ID environment variable
     3. Empty string — legacy unsuffixed filenames (lowest priority)
     """
     cli_id = getattr(args, "session_id", None)
     if cli_id:
         return cli_id
-    env_id = os.environ.get("CODEX_SESSION_ID") or os.environ.get("CLAUDE_SESSION_ID", "")
+    env_id = (
+        os.environ.get("CODEX_SESSION_ID")
+        or os.environ.get("CODEX_THREAD_ID")
+        or os.environ.get("CLAUDE_SESSION_ID", "")
+    )
     return env_id
 
 
@@ -64,7 +70,7 @@ def get_state_path(loop: str, session_id: str = "") -> Path:
         print(f"Error: Unknown loop '{loop}'", file=sys.stderr)
         sys.exit(1)
     project_dir = get_project_dir()
-    crew_dir = project_dir / ".codex-crew"
+    crew_dir = project_dir / CREW_DIR_NAME
     crew_dir.mkdir(parents=True, exist_ok=True)
     return crew_dir / get_loop_filename(canonical, session_id)
 
@@ -148,7 +154,7 @@ def check_for_conflicts(session_id: str = ""):
     A different session's active loop is NOT a conflict.
     """
     project_dir = get_project_dir()
-    crew_dir = project_dir / ".codex-crew"
+    crew_dir = project_dir / CREW_DIR_NAME
 
     bl_path = crew_dir / get_loop_filename("bl", session_id)
     bl_state = BuildState.load(bl_path)
@@ -199,9 +205,9 @@ def cmd_init(args):
         # Auto-derive plan file from task if --auto-plan is set
         if args.auto_plan:
             plan_name = slugify(args.task)
-            plan_file = f".codex-crew/plans/{plan_name}.md"
+            plan_file = f"{CREW_DIR_NAME}/plans/{plan_name}.md"
             # Ensure plans directory exists
-            plans_dir = get_project_dir() / ".codex-crew" / "plans"
+            plans_dir = get_project_dir() / CREW_DIR_NAME / "plans"
             plans_dir.mkdir(parents=True, exist_ok=True)
         elif args.plan_file:
             plan_file = args.plan_file

@@ -22,6 +22,7 @@ MAX_AGE_DAYS = 7
 MAX_AGE_SECONDS = MAX_AGE_DAYS * 86400
 STALE_INACTIVE_SECONDS = 86400
 VERBOSE_SESSION_START_VALUES = {"1", "true", "yes", "verbose", "full"}
+CREW_DIR_NAME = ".crew"
 
 
 def cleanup_stale_files(directory: Path) -> None:
@@ -122,7 +123,7 @@ def crew_state_command() -> str:
 
 def build_session_status(directory: Path, session_id: str = "") -> list[str]:
     messages: list[str] = []
-    crew_dir = directory / ".codex-crew"
+    crew_dir = directory / CREW_DIR_NAME
 
     this_session_loops: list[str] = []
     other_session_loops: list[str] = []
@@ -182,7 +183,7 @@ def build_session_status(directory: Path, session_id: str = "") -> list[str]:
 
     context_snapshot = crew_dir / "context-snapshot.md"
     if context_snapshot.is_file() and get_file_age_days(context_snapshot) < MAX_AGE_DAYS:
-        messages.append("[Context Snapshot Available]\nRead `.codex-crew/context-snapshot.md` to restore context.")
+        messages.append("[Context Snapshot Available]\nRead `.crew/context-snapshot.md` to restore context.")
 
     return messages
 
@@ -193,7 +194,7 @@ def main() -> None:
     directory = hook_input.directory_path
     session_id = hook_input.session_id
 
-    cleanup_stale_files(directory / ".codex-crew")
+    cleanup_stale_files(directory / CREW_DIR_NAME)
 
     context_parts: list[str] = []
     if is_verbose_session_start():

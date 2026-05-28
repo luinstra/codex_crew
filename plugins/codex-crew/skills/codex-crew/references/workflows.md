@@ -7,8 +7,9 @@ This skill ports the Claude Crew workflow model to Codex. It provides promptable
 - Do simple work directly.
 - For multi-step work, maintain an explicit plan or task list.
 - Use Codex subagents only when the user explicitly asks for subagents, delegation, parallel agents, or a named custom agent.
-- Keep state in `.codex-crew/`.
-- Store plans in `.codex-crew/plans/`.
+- Keep shared Crew state in `.crew/`.
+- Store plans in `.crew/plans/`.
+- Loop state files are session-scoped from Codex or Claude session/thread IDs; plans and context snapshots are intentionally shared with Claude Crew.
 - Run verification before declaring implementation work complete.
 - When running bundled scripts, resolve `../../scripts/crew-state.py` relative to this `SKILL.md` file.
 
@@ -42,7 +43,7 @@ python3 ../../scripts/crew-state.py show bl
 python3 ../../scripts/crew-state.py show mt
 ```
 
-Then check whether `.codex-crew/context-snapshot.md` exists.
+Then check whether `.crew/context-snapshot.md` exists.
 
 Report:
 
@@ -98,7 +99,7 @@ Use when the user asks to plan or when implementation would benefit from a writt
 1. If the request names a file path, read it and treat it as requirements.
 2. Otherwise ask only the missing product or preference questions needed to plan safely.
 3. Inspect the codebase yourself for implementation facts.
-4. Write the plan to `.codex-crew/plans/{descriptive-name}.md`.
+4. Write the plan to `.crew/plans/{descriptive-name}.md`.
 5. Return a concise summary and the plan path.
 
 Plan format:
@@ -135,7 +136,7 @@ Plan format:
 
 Use when the user asks to execute a plan or task.
 
-1. If the user references a plan, locate it under `.codex-crew/plans/` and read it.
+1. If the user references a plan, locate it under `.crew/plans/` and read it.
 2. Implement the work directly unless the user explicitly asks for subagents.
 3. If subagents are explicitly requested, use the custom agent guidance below.
 4. Run the verification from the plan, or the closest repo-native checks.
@@ -231,7 +232,7 @@ Then summarize any current plan state and stop the measure-twice workflow.
 
 ## Save Context
 
-Create `.codex-crew/context-snapshot.md`:
+Create `.crew/context-snapshot.md`:
 
 ```markdown
 # Context Snapshot
@@ -259,11 +260,11 @@ Saved: {UTC timestamp}
 
 ## Restore Context
 
-If `.codex-crew/context-snapshot.md` exists:
+If `.crew/context-snapshot.md` exists:
 
 1. Read it.
 2. Summarize current task, progress, decisions, modified files, and next steps.
-3. Rename it to `.codex-crew/context-snapshot.restored.md` after restoration.
+3. Rename it to `.crew/context-snapshot.restored.md` after restoration.
 
 If absent, tell the user no snapshot exists.
 

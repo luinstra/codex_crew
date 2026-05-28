@@ -5,7 +5,8 @@
 - This repo is a Codex plugin marketplace. The plugin root is `plugins/codex-crew/`.
 - Keep Claude-specific files out of this repo unless they are clearly documented as migration references.
 - Prefer Codex-native terms: skills, hooks, custom agents, and `AGENTS.md`.
-- Store workflow state in `.codex-crew/`, not `.crew/`.
+- Share Crew workflow state in `.crew/` so Codex and Claude can coordinate on the same project.
+- Loop state files are session-scoped; plans and context snapshots are intentionally shared.
 
 ## Quick Commands
 
