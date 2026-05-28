@@ -35,6 +35,12 @@ python3 scripts/test-hooks.py
 
 `crew configure` maps the old Claude Crew config command to Codex-native `AGENTS.md` guidance.
 
+## SessionStart Noise
+
+The SessionStart hook is quiet by default. It only injects extra context when Crew state needs attention, such as an active loop or a saved context snapshot.
+
+Set `CODEX_CREW_SESSION_START=verbose` before launching Codex to restore the generic Crew guidance and stack-skill hints on every session start.
+
 ## Agent Templates
 
 ```bash

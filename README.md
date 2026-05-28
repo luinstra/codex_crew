@@ -94,6 +94,16 @@ State is stored under `.codex-crew/` in the active project.
 
 `crew configure` is intentionally not a direct copy of Claude Crew's `/crew:crew-config`. In Codex, the project guidance path is `AGENTS.md`; use `crew configure` or `crew deepinit` to create or update project-local guidance instead of copying Claude-specific config.
 
+## SessionStart Hook Output
+
+The SessionStart hook is quiet by default. It emits context only when Crew state needs attention, such as an active build loop, an active measure-twice loop, another active Crew session, or a saved context snapshot.
+
+To restore generic Crew guidance and stack-skill hints on every session start, launch Codex with:
+
+```bash
+CODEX_CREW_SESSION_START=verbose
+```
+
 ## Development
 
 Run the script tests:

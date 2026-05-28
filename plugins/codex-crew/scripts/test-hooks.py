@@ -27,10 +27,13 @@ def run_script(
     args: list[str],
     project_dir: Path,
     stdin: dict | None = None,
+    env_overrides: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env["CODEX_PROJECT_DIR"] = str(project_dir)
     env["CODEX_SESSION_ID"] = "session-123"
+    if env_overrides:
+        env.update(env_overrides)
     return subprocess.run(
         [sys.executable, str(script), *args],
         input=json.dumps(stdin) if stdin is not None else None,
@@ -234,7 +237,7 @@ class CrewStateTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(json.loads(result.stdout), {})
 
-    def test_session_start_injects_context(self) -> None:
+    def test_session_start_is_quiet_without_active_state(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project_dir = Path(tmp)
             result = run_script(
@@ -245,11 +248,9 @@ class CrewStateTests(unittest.TestCase):
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
-            payload = json.loads(result.stdout)
-            context = payload["hookSpecificOutput"]["additionalContext"]
-            self.assertIn("Crew is available", context)
+            self.assertEqual(json.loads(result.stdout), {})
 
-    def test_session_start_reports_stack_hints_and_context_snapshot(self) -> None:
+    def test_session_start_verbose_mode_injects_guidance_and_stack_hints(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project_dir = Path(tmp)
             (project_dir / "src").mkdir()
@@ -268,12 +269,41 @@ class CrewStateTests(unittest.TestCase):
                 [],
                 project_dir,
                 {"cwd": str(project_dir), "session_id": "session-123", "hook_event_name": "SessionStart"},
+                {"CODEX_CREW_SESSION_START": "verbose"},
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
             context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
-            for expected in ["Kotlin", "Gradle", "Exposed", "Trino", "Python", "Context Snapshot Available"]:
+            for expected in [
+                "Crew is available",
+                "Kotlin",
+                "Gradle",
+                "Exposed",
+                "Trino",
+                "Python",
+                "Context Snapshot Available",
+            ]:
                 self.assertIn(expected, context)
+
+    def test_session_start_reports_context_snapshot_without_stack_hints(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            project_dir = Path(tmp)
+            (project_dir / "tool.py").write_text("print('hello')\n")
+            crew_dir = project_dir / ".codex-crew"
+            crew_dir.mkdir()
+            (crew_dir / "context-snapshot.md").write_text("# Snapshot\n")
+
+            result = run_script(
+                SESSION_START,
+                [],
+                project_dir,
+                {"cwd": str(project_dir), "session_id": "session-123", "hook_event_name": "SessionStart"},
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
+            self.assertIn("Context Snapshot Available", context)
+            self.assertNotIn("Relevant skills may include", context)
 
     def test_session_start_reports_other_active_sessions(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -21,6 +21,7 @@ from state_discovery import is_active_state_file, is_loop_state_file
 MAX_AGE_DAYS = 7
 MAX_AGE_SECONDS = MAX_AGE_DAYS * 86400
 STALE_INACTIVE_SECONDS = 86400
+VERBOSE_SESSION_START_VALUES = {"1", "true", "yes", "verbose", "full"}
 
 
 def cleanup_stale_files(directory: Path) -> None:
@@ -106,6 +107,12 @@ def build_plugin_guidance(stack_hints: list[str]) -> str:
     return "\n".join(lines)
 
 
+def is_verbose_session_start() -> bool:
+    """Return whether SessionStart should include generic guidance."""
+    value = os.environ.get("CODEX_CREW_SESSION_START", "")
+    return value.strip().lower() in VERBOSE_SESSION_START_VALUES
+
+
 def crew_state_command() -> str:
     plugin_root = os.environ.get("PLUGIN_ROOT") or os.environ.get("CLAUDE_PLUGIN_ROOT")
     if plugin_root:
@@ -116,13 +123,6 @@ def crew_state_command() -> str:
 def build_session_status(directory: Path, session_id: str = "") -> list[str]:
     messages: list[str] = []
     crew_dir = directory / ".codex-crew"
-
-    if session_id:
-        messages.append(
-            f"[Crew Session ID: {session_id}]\n"
-            f"When invoking the state CLI manually, pass --session-id {session_id}.\n"
-            f"State CLI: {crew_state_command()}"
-        )
 
     this_session_loops: list[str] = []
     other_session_loops: list[str] = []
@@ -142,17 +142,31 @@ def build_session_status(directory: Path, session_id: str = "") -> list[str]:
             is_this_session = not session_id or file_session in ("", session_id)
 
             if json_file.name.startswith("build-state"):
+                deactivate_hint = ""
+                if session_id:
+                    deactivate_hint = (
+                        f"\nDeactivate with: {crew_state_command()} deactivate bl "
+                        f"--session-id {session_id} --reason \"Verified complete\""
+                    )
                 line = (
                     f"[Build Loop Active - {data.get('iteration', 1)}/{data.get('max_iterations', 10)}]\n"
                     f"Task: {data.get('prompt', '')}\n"
                     "Continue until implementation is verified and the loop is deactivated."
+                    f"{deactivate_hint}"
                 )
             elif json_file.name.startswith("measure-twice-state"):
+                deactivate_hint = ""
+                if session_id:
+                    deactivate_hint = (
+                        f"\nDeactivate with: {crew_state_command()} deactivate mt "
+                        f"--session-id {session_id} --reason \"Plan approved\""
+                    )
                 line = (
                     f"[Measure-Twice Loop Active - {data.get('iteration', 1)}/{data.get('max_iterations', 10)}]\n"
                     f"Task: {data.get('task_description', '')}\n"
                     f"Plan: {data.get('plan_file', '')}\n"
                     "Continue until the plan is approved and the loop is deactivated."
+                    f"{deactivate_hint}"
                 )
             else:
                 continue
@@ -181,8 +195,10 @@ def main() -> None:
 
     cleanup_stale_files(directory / ".codex-crew")
 
-    stack_hints = detect_project_stack(directory)
-    context_parts = [build_plugin_guidance(stack_hints)]
+    context_parts: list[str] = []
+    if is_verbose_session_start():
+        context_parts.append(build_plugin_guidance(detect_project_stack(directory)))
+
     status_messages = build_session_status(directory, session_id)
     if status_messages:
         context_parts.append("\n\n".join(status_messages))

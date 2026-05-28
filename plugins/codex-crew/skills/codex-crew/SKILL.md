@@ -13,7 +13,7 @@ Read [Workflow Reference](references/workflows.md) before running a Crew workflo
 - Keep state in `.codex-crew/` and plans in `.codex-crew/plans/`.
 - Run verification before declaring implementation work complete.
 - Use Codex subagents only when the user explicitly asks for subagents, delegation, parallel agents, or a named custom agent.
-- For script commands, resolve `../../scripts/crew-state.py` relative to this `SKILL.md` file, or use the State CLI path injected by the SessionStart hook.
+- For script commands, resolve `../../scripts/crew-state.py` relative to this `SKILL.md` file.
 
 ## Prompt Map
 
