@@ -1,9 +1,9 @@
-# Codex Crew
+# Crew
 
-Codex Crew is a Codex-native port of the Claude Crew workflow set. It packages:
+Crew is a Codex-native port of the Claude Crew workflow set. It packages:
 
 - Persistent workflow hooks for build and measure-twice loops.
-- A `codex-crew` workflow skill that replaces the Claude slash commands.
+- A `crew` workflow skill that replaces the Claude slash commands.
 - Tech-stack skills for Kotlin, Kotlin testing, Exposed, Gradle, Trino, Python, and Git.
 - Custom agent templates for advisor, executor, reader, and documentation roles.
 
@@ -60,19 +60,19 @@ Use them only when you explicitly ask Codex to spawn subagents or name one of th
 
 ## Workflow Prompts
 
-Codex Crew uses promptable workflows instead of Claude slash commands:
+Crew uses promptable workflows instead of Claude slash commands:
 
 | Intent | Prompt |
 | --- | --- |
-| Plan | `Use Codex Crew to plan: ...` |
-| Execute | `Use Codex Crew to execute: ...` |
-| Review | `Use Codex Crew to review this plan` |
-| Build loop | `Use Codex Crew build loop for: ...` |
-| Measure twice | `Use Codex Crew measure twice for: ...` |
-| Status | `Use Codex Crew status` |
-| Save context | `Use Codex Crew save context` |
-| Restore context | `Use Codex Crew restore context` |
-| Deepinit | `Use Codex Crew deepinit` |
+| Plan | `crew plan: ...` |
+| Execute | `crew execute: ...` |
+| Review | `crew review this plan` |
+| Build loop | `crew build: ...` |
+| Measure twice | `crew measure twice: ...` |
+| Status | `crew status` |
+| Save context | `crew save context` |
+| Restore context | `crew restore context` |
+| Deepinit | `crew deepinit` |
 
 State is stored under `.codex-crew/` in the active project.
 

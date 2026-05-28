@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Codex Crew SessionStart hook.
+"""Crew SessionStart hook.
 
 Restores active Crew loop context and injects lightweight skill guidance.
 """
@@ -24,7 +24,7 @@ STALE_INACTIVE_SECONDS = 86400
 
 
 def cleanup_stale_files(directory: Path) -> None:
-    """Remove stale Codex Crew state files."""
+    """Remove stale Crew state files."""
     if not directory.is_dir():
         return
 
@@ -74,9 +74,9 @@ def detect_project_stack(directory: Path) -> list[str]:
 def build_plugin_guidance(stack_hints: list[str]) -> str:
     lines = [
         "<system-reminder>",
-        "Codex Crew is available in this session.",
+        "Crew is available in this session.",
         "",
-        "Use the `codex-crew` skill for planning, execution workflows, build loops,",
+        "Use the `crew` skill for planning, execution workflows, build loops,",
         "measure-twice loops, context snapshots, status checks, and AGENTS.md deepinit.",
         "",
         "Use custom agents only when the user explicitly asks for subagents, delegation,",
@@ -119,7 +119,7 @@ def build_session_status(directory: Path, session_id: str = "") -> list[str]:
 
     if session_id:
         messages.append(
-            f"[Codex Crew Session ID: {session_id}]\n"
+            f"[Crew Session ID: {session_id}]\n"
             f"When invoking the state CLI manually, pass --session-id {session_id}.\n"
             f"State CLI: {crew_state_command()}"
         )
@@ -164,7 +164,7 @@ def build_session_status(directory: Path, session_id: str = "") -> list[str]:
 
     messages.extend(this_session_loops)
     if other_session_loops:
-        messages.append("[Other Codex Crew Sessions]\n" + "\n".join(f"- {line}" for line in other_session_loops))
+        messages.append("[Other Crew Sessions]\n" + "\n".join(f"- {line}" for line in other_session_loops))
 
     context_snapshot = crew_dir / "context-snapshot.md"
     if context_snapshot.is_file() and get_file_age_days(context_snapshot) < MAX_AGE_DAYS:
