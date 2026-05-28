@@ -25,7 +25,18 @@ The actual Codex plugin lives in `plugins/codex-crew/`. The root marketplace fil
 
 ## Install Locally
 
-From Codex, add or install the marketplace using the repo path once this repository exists locally.
+Clone the marketplace repo, then add or install the marketplace from Codex using the local checkout:
+
+```bash
+git clone https://github.com/luinstra/codex_crew.git
+cd codex_crew
+```
+
+Marketplace file:
+
+```text
+.agents/plugins/marketplace.json
+```
 
 For development, the plugin root is:
 
@@ -69,13 +80,19 @@ Crew uses promptable workflows instead of Claude slash commands:
 | Execute | `crew execute: ...` |
 | Review | `crew review this plan` |
 | Build loop | `crew build: ...` |
+| Cancel build loop | `crew cancel build` |
 | Measure twice | `crew measure twice: ...` |
+| Cancel measure twice | `crew cancel measure twice` |
+| Code search | `crew code search: ...` |
 | Status | `crew status` |
 | Save context | `crew save context` |
 | Restore context | `crew restore context` |
+| Configure project | `crew configure` |
 | Deepinit | `crew deepinit` |
 
 State is stored under `.codex-crew/` in the active project.
+
+`crew configure` is intentionally not a direct copy of Claude Crew's `/crew:crew-config`. In Codex, the project guidance path is `AGENTS.md`; use `crew configure` or `crew deepinit` to create or update project-local guidance instead of copying Claude-specific config.
 
 ## Development
 

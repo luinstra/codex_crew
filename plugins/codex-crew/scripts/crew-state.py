@@ -158,7 +158,10 @@ def check_for_conflicts(session_id: str = ""):
     mt_path = crew_dir / get_loop_filename("mt", session_id)
     mt_state = MeasureTwiceState.load(mt_path)
     if mt_state.active:
-        return "ERROR: measure-twice loop is already active. Ask crew to cancel the measure-twice loop first or let it complete."
+        return (
+            "ERROR: measure-twice loop is already active. "
+            "Ask crew to cancel the measure-twice loop first or let it complete."
+        )
 
     return None
 
@@ -278,7 +281,10 @@ def main():
     p_active.set_defaults(func=cmd_is_active)
 
     # check-conflicts
-    p_conflicts = subparsers.add_parser("check-conflicts", help="Check if this session has any active loop (exit 1 if conflict)")
+    p_conflicts = subparsers.add_parser(
+        "check-conflicts",
+        help="Check if this session has any active loop (exit 1 if conflict)",
+    )
     p_conflicts.add_argument("--session-id", dest="session_id", help="Session ID to check conflicts for")
     p_conflicts.set_defaults(func=cmd_check_conflicts)
 
